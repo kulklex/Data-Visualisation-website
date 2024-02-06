@@ -25,15 +25,15 @@ interface Football {
 // Read file
 async function readFootballData() {
     // Team we want the data for
-    const team: string = 'Arsenal';
+    const team: string = 'Chelsea';
 
     // Track the number of entries for the team we are following
     let counter: number = 0;
 
-    console.log("Reading Arsenal data ...");
+    console.log("Reading Chelsea data ...");
     
     // Use async/await to handle asynchronous operations
-    await fs.createReadStream(csvFile)
+    fs.createReadStream(csvFile)
         .pipe(csv())
         .on('data', async (data: Football) => {
             if (data.Home === team || data.Away === team) {
@@ -50,19 +50,20 @@ async function readFootballData() {
                 const command = new PutCommand({
                     TableName: "FootballMatches",
                     Item: {
-                        "MatchTS" : date.getTime(),
-                        "Score" : goalDifference,
-                        "TeamName" : "Arsenal"
+                        "MatchTS": date.getTime(),
+                        "Score": goalDifference,
+                        "TeamName": "Chelsea"
                     }
                 });
 
                 try {
                     // Store data in DynamoDB
                     const response = await docClient.send(command);
-                    return response
+                    return response;
                 } catch (err) {
-                    console.error("Error saving data: ", err)
+                    console.error("Error saving data: ", err);
                 }
+
                 // Log out data
                 // console.log(`${++counter}. UnixTime: ${date.getTime()}. ${data.Home} goals: ${data.HomeGoals}; ${data.Away} goals: ${data.AwayGoals}. Goal Difference: ${goalDifference}`);
             }
@@ -86,13 +87,13 @@ function calculateGoalDifference(data: Football, team: string): number {
     const awayGoals = parseInt(data.AwayGoals);
 
     if (data.Home === team) {
-        // Arsenal is the home team
+        // Chelsea is the home team
         return calculateSingleNumber(homeGoals - awayGoals);
     } else if (data.Away === team) {
-        // Arsenal is the away team
+        // Chelsea is the away team
         return calculateSingleNumber(awayGoals - homeGoals);
     } else {
-        // Arsenal is not playing in this match
+        // Chelsea is not playing in this match
         return 0;
     }
 }

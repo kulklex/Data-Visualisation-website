@@ -12,35 +12,44 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeApiCall = void 0;
+// Import axios library for making HTTP requests
 const axios_1 = __importDefault(require("axios"));
+// Import dotenv for loading environment variables from a .env file
 const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables from a .env file
 dotenv_1.default.config();
+// The base URL for the News API
 const apiUrl = 'https://newsapi.org/v2/everything';
+// Function to create dynamic API parameters
 let createApiParams = (query) => ({
     q: query,
     sortBy: 'popularity',
     language: 'en',
-    apiKey: 'bc1697d5f460435fbf9be668688ee620',
+    apiKey: 'bc1697d5f460435fbf9be668688ee620', // API key 
 });
-// Make API call
+// Function to make an API call
 const makeApiCall = (query) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
-        // A dynamic parameters based on the query
+        // Create dynamic parameters based on the query
         const params = createApiParams(query);
-        // GET request using axios
-        const response = yield axios_1.default.get('https://newsapi.org/v2/everything', { params });
+        // Make a GET request using axios
+        const response = yield axios_1.default.get(apiUrl, { params });
         // Handle the API response
         console.log('API Response:', (_a = response.data) === null || _a === void 0 ? void 0 : _a.articles);
         // Get the total number of articles
         console.log("\n" + ((_b = response.data) === null || _b === void 0 ? void 0 : _b.articles.length));
     }
     catch (error) {
+        // Handle errors
         console.error('Error:', error);
     }
 });
-makeApiCall("Arsenal FC");
-makeApiCall("Chelsea FC");
-makeApiCall("Liverpool FC");
-makeApiCall("Manchester United");
-makeApiCall("Manchester City FC");
+exports.makeApiCall = makeApiCall;
+// Example API calls for different football teams
+(0, exports.makeApiCall)("Arsenal FC");
+(0, exports.makeApiCall)("Chelsea FC");
+(0, exports.makeApiCall)("Liverpool FC");
+(0, exports.makeApiCall)("Manchester United");
+(0, exports.makeApiCall)("Manchester City FC");

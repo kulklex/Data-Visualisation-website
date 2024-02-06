@@ -27,7 +27,7 @@ let createApiParams = (query: string): ApiParams => ({
 });
 
 // Function to make an API call
-const makeApiCall = async (query: string): Promise<void> => {
+export const makeApiCall = async (query: string): Promise<void> => {
   try {
     // Create dynamic parameters based on the query
     const params = createApiParams(query);

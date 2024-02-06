@@ -27,12 +27,12 @@ const docClient = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 function readFootballData() {
     return __awaiter(this, void 0, void 0, function* () {
         // Team we want the data for
-        const team = 'Arsenal';
+        const team = 'Chelsea';
         // Track the number of entries for the team we are following
         let counter = 0;
-        console.log("Reading Arsenal data ...");
+        console.log("Reading Chelsea data ...");
         // Use async/await to handle asynchronous operations
-        yield fs_1.default.createReadStream(csvFile)
+        fs_1.default.createReadStream(csvFile)
             .pipe((0, csv_parser_1.default)())
             .on('data', (data) => __awaiter(this, void 0, void 0, function* () {
             if (data.Home === team || data.Away === team) {
@@ -48,7 +48,7 @@ function readFootballData() {
                     Item: {
                         "MatchTS": date.getTime(),
                         "Score": goalDifference,
-                        "TeamName": "Arsenal"
+                        "TeamName": "Chelsea"
                     }
                 });
                 try {
@@ -80,15 +80,15 @@ function calculateGoalDifference(data, team) {
     const homeGoals = parseInt(data.HomeGoals);
     const awayGoals = parseInt(data.AwayGoals);
     if (data.Home === team) {
-        // Arsenal is the home team
+        // Chelsea is the home team
         return calculateSingleNumber(homeGoals - awayGoals);
     }
     else if (data.Away === team) {
-        // Arsenal is the away team
+        // Chelsea is the away team
         return calculateSingleNumber(awayGoals - homeGoals);
     }
     else {
-        // Arsenal is not playing in this match
+        // Chelsea is not playing in this match
         return 0;
     }
 }
