@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node ArsenalData.js"
+    "start": "node ChelseaData.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.506.0",

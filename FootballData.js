@@ -23,49 +23,57 @@ const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 // Configure AWS DynamoDB client
 const client = new client_dynamodb_1.DynamoDBClient({ region: "us-east-1" }); // AWS region
 const docClient = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
+// All football teams
+const FootballTeams = ["Arsenal", "Chelsea", "Manchester City", "Manchester Utd", "Liverpool"];
 // Read file
 function readFootballData() {
     return __awaiter(this, void 0, void 0, function* () {
         // Team we want the data for
-        const team = 'Chelsea';
-        // Track the number of entries for the team we are following
-        let counter = 0;
-        console.log("Reading Chelsea data ...");
+        console.log("Reading data ...");
+        // Store all the data from the csv file here
+        let csvData = [];
         // Use async/await to handle asynchronous operations
         fs_1.default.createReadStream(csvFile)
             .pipe((0, csv_parser_1.default)())
-            .on('data', (data) => __awaiter(this, void 0, void 0, function* () {
-            if (data.Home === team || data.Away === team) {
-                // Convert date to US format
-                const usDate = ukToUsDate(data.Date);
-                // Change to JavaScript Date format
-                const date = new Date(usDate);
-                // Calculate goal difference
-                const goalDifference = calculateGoalDifference(data, team);
-                // Create DynamoDB PutCommand to store data
-                const command = new lib_dynamodb_1.PutCommand({
-                    TableName: "FootballMatches",
-                    Item: {
-                        "MatchTS": date.getTime(),
-                        "Score": goalDifference,
-                        "TeamName": "Chelsea"
-                    }
-                });
-                try {
-                    // Store data in DynamoDB
-                    const response = yield docClient.send(command);
-                    return response;
-                }
-                catch (err) {
-                    console.error("Error saving data: ", err);
-                }
-                // Log out data
-                // console.log(`${++counter}. UnixTime: ${date.getTime()}. ${data.Home} goals: ${data.HomeGoals}; ${data.Away} goals: ${data.AwayGoals}. Goal Difference: ${goalDifference}`);
-            }
+            .on('data', (footballData) => __awaiter(this, void 0, void 0, function* () {
+            csvData.push(footballData);
         }))
-            .on('end', () => {
-            console.log("Data reading complete");
-        });
+            .on('end', () => __awaiter(this, void 0, void 0, function* () {
+            for (const data of csvData) {
+                yield addData(data);
+                yield addData(data, false);
+            }
+        }));
+    });
+}
+function addData(data, home = true) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const team = data[home ? 'Home' : 'Away'];
+        if (FootballTeams.includes(team)) {
+            // Convert date to US format
+            const usDate = ukToUsDate(data.Date);
+            // // Change to JavaScript Date format
+            const date = new Date(usDate);
+            // Calculate goal difference
+            const goalDifference = calculateGoalDifference(data, team);
+            // Create DynamoDB PutCommand to store data
+            const command = new lib_dynamodb_1.PutCommand({
+                TableName: "FootballMatches",
+                Item: {
+                    "MatchTS": date.getTime(),
+                    "Score": goalDifference,
+                    "TeamName": team
+                }
+            });
+            try {
+                // Store data in DynamoDB
+                yield docClient.send(command);
+                console.log(team + " updated");
+            }
+            catch (err) {
+                console.error("Error saving data: ", err);
+            }
+        }
     });
 }
 // Converts UK date to US date
