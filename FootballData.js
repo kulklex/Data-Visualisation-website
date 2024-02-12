@@ -24,9 +24,9 @@ const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: "us-east-1" }); // AWS region
 const docClient = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 // All football teams
-const FootballTeams = ["Arsenal", "Chelsea", "Manchester City", "Manchester Utd", "Liverpool"];
+const FootballTeams = ["Arsenal", "Selected Club", "Manchester City", "Manchester Utd", "Liverpool"];
 // Read file
-function readFootballData() {
+function readAndStoreFootballData() {
     return __awaiter(this, void 0, void 0, function* () {
         // Team we want the data for
         console.log("Reading data ...");
@@ -46,6 +46,7 @@ function readFootballData() {
         }));
     });
 }
+// Function to add data to DynamoDB
 function addData(data, home = true) {
     return __awaiter(this, void 0, void 0, function* () {
         const team = data[home ? 'Home' : 'Away'];
@@ -76,6 +77,25 @@ function addData(data, home = true) {
         }
     });
 }
+// Function that executes the scan operation
+function scanFootballTeams(partitionKey) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("Scanning " + partitionKey + " Items........");
+        try {
+            // Execute the scan command
+            const command = new lib_dynamodb_1.ScanCommand({ TableName: "FootballMatches" });
+            const response = yield docClient.send(command);
+            // Filter the results to include only items with the specified partition key value
+            const filteredItems = (_a = response.Items) === null || _a === void 0 ? void 0 : _a.filter((item) => item.TeamName === partitionKey);
+            // Output the filtered items
+            console.log('Filtered items:', filteredItems);
+        }
+        catch (error) {
+            console.error('Error scanning DynamoDB:', error);
+        }
+    });
+}
 // Converts UK date to US date
 function ukToUsDate(date) {
     // Split date
@@ -88,15 +108,15 @@ function calculateGoalDifference(data, team) {
     const homeGoals = parseInt(data.HomeGoals);
     const awayGoals = parseInt(data.AwayGoals);
     if (data.Home === team) {
-        // Chelsea is the home team
+        // Selected Club is the home team
         return calculateSingleNumber(homeGoals - awayGoals);
     }
     else if (data.Away === team) {
-        // Chelsea is the away team
+        // Selected Club is the away team
         return calculateSingleNumber(awayGoals - homeGoals);
     }
     else {
-        // Chelsea is not playing in this match
+        // Selected Club is not playing in this match
         return 0;
     }
 }
@@ -140,4 +160,5 @@ function calculateSingleNumber(goalDifference) {
     }
 }
 // Execute the script
-readFootballData();
+// readAndStoreFootballData();
+scanFootballTeams("Manchester City");
