@@ -56,28 +56,28 @@ export const makeApiCall = async (query: string): Promise<void> => {
     // Handle the API response
     const articles = response.data?.articles;
     if (articles?.length) {
-      articles.map(async (article:ArticleType) => {
-      const dateString = article.publishedAt
-      const dateInMilliSeconds = convertDateToMilliseconds(dateString)
-      
-      const command = new PutCommand({
-      TableName: "FootballNews",
-      Item: {
-        "MatchTS": dateInMilliSeconds,
-        "News": article.title,
-        "TeamName": query,
-        "Url": article.url
-      }
-    })
-    try {
-      // Store data in DynamoDB
-      await docClient.send(command);
-      console.log(query + " updated");
-      
-  } catch (err) {
-      console.error("Error saving data: ", err);
-  }
- 
+      articles.map(async (article: ArticleType) => {
+        const dateString = article.publishedAt
+        const dateInMilliSeconds = convertDateToMilliseconds(dateString)
+
+        const command = new PutCommand({
+          TableName: "FootballNews",
+          Item: {
+            "MatchTS": dateInMilliSeconds,
+            "News": article.title,
+            "TeamName": query,
+            "Url": article.url
+          }
+        })
+        try {
+          // Store data in DynamoDB
+          await docClient.send(command);
+          console.log(query + " updated");
+
+        } catch (err) {
+          console.error("Error saving data: ", err);
+        }
+
       })
     }
   } catch (error) {

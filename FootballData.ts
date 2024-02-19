@@ -26,14 +26,14 @@ interface Football {
 }
 
 // Read file
-async function readAndStoreFootballData() : Promise<void> {
+async function readAndStoreFootballData(): Promise<void> {
     // Team we want the data for
-    
+
     console.log("Reading data ...");
 
     // Store all the data from the csv file here
-    let csvData:any = []
-    
+    let csvData: any = []
+
     // Use async/await to handle asynchronous operations
     fs.createReadStream(csvFile)
         .pipe(csv())
@@ -49,7 +49,7 @@ async function readAndStoreFootballData() : Promise<void> {
 }
 
 // Function to add data to DynamoDB
-async function addData(data: Football, home = true) : Promise<void> {
+async function addData(data: Football, home = true): Promise<void> {
     const team = data[home ? 'Home' : 'Away']
     if (FootballTeams.includes(team)) {
         // Convert date to US format
@@ -74,7 +74,7 @@ async function addData(data: Football, home = true) : Promise<void> {
             // Store data in DynamoDB
             await docClient.send(command);
             console.log(team + " updated");
-            
+
         } catch (err) {
             console.error("Error saving data: ", err);
         }
@@ -82,22 +82,22 @@ async function addData(data: Football, home = true) : Promise<void> {
 }
 
 // Function that executes the scan operation
-async function scanFootballTeams(partitionKey: string) : Promise<void> {
+async function scanFootballTeams(partitionKey: string): Promise<void> {
     console.log("Scanning " + partitionKey + " Items........")
     try {
-      // Execute the scan command
-      const command = new ScanCommand({ TableName: "FootballMatches" });
-      const response = await docClient.send(command);
-  
-      // Filter the results to include only items with the specified partition key value
-      const filteredItems = response.Items?.filter((item: Record<string, any>) => item.TeamName === partitionKey);
+        // Execute the scan command
+        const command = new ScanCommand({ TableName: "FootballMatches" });
+        const response = await docClient.send(command);
 
-      // Output the filtered items
-      console.log('Filtered items:', filteredItems);
+        // Filter the results to include only items with the specified partition key value
+        const filteredItems = response.Items?.filter((item: Record<string, any>) => item.TeamName === partitionKey);
+
+        // Output the filtered items
+        console.log('Filtered items:', filteredItems);
     } catch (error) {
-      console.error('Error scanning DynamoDB:', error);
+        console.error('Error scanning DynamoDB:', error);
     }
-  }
+}
 
 // Converts UK date to US date
 function ukToUsDate(date: string): string {
@@ -154,7 +154,7 @@ function calculateSingleNumber(goalDifference: number): number {
 }
 
 // Execute the script
-// readAndStoreFootballData();
+readAndStoreFootballData();
 
 
 scanFootballTeams("Manchester City")
