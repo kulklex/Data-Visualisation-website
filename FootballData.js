@@ -160,5 +160,5 @@ function calculateSingleNumber(goalDifference) {
     }
 }
 // Execute the script
-// readAndStoreFootballData();
+readAndStoreFootballData();
 scanFootballTeams("Manchester City");
