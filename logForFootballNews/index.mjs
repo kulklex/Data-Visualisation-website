@@ -1,5 +1,12 @@
 import axios from 'axios';
 
+// AWS DynamoDB imports
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+
+// Configure AWS DynamoDB client
+const client = new DynamoDBClient({ region: "us-east-1" }); // AWS region
+const docClient = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
   //Extract data from event
@@ -12,14 +19,11 @@ export const handler = async (event) => {
       const timestamp = record.dynamodb.NewImage.MatchTS.N;
     
     //Extract team
-      const team = record.dynamodb.NewImage.TeamName.S;
+    const team = record.dynamodb.NewImage.TeamName.S;
       
-      console.log(`News: ${text} \n`);
-      console.log(`Timestamp: ${timestamp}\n`);
-      console.log(`Teamname: ${team}\n`);
-      
-      //Process news text for sentiment
-      //URL of web service
+   
+    //Process news text for sentiment
+    //URL of web service
     let url = `http://text-processing.com/api/sentiment/`;
 
     //Sent GET to endpoint with Axios
@@ -31,14 +35,37 @@ export const handler = async (event) => {
         }
     });
       
+    console.log(`News: ${text} \n`);
+    console.log(`Timestamp: ${timestamp}\n`);
+    console.log(`Teamname: ${team}\n`);
       
-    console.log(`Sentiment: ${response.data}\n`);
+          
+    //USe Wee 19 code, if you like...
       
-      //USe Wee 19 code, if you like...
+    //Have sentiment, team and timstamp  
+    const sentiment = JSON.stringify(response.data.label);
+    console.log(`Sentiment: ${JSON.parse(sentiment)}\n`);
+
       
-      //HAve sentiment, team and timstamp
+      
       //Save in new table 
-      
+      const command = new PutCommand({
+          TableName: "Sentiment",
+          Item: {
+            "MatchTS": parseInt(timestamp),
+            "TeamName": team,
+            "Result": JSON.parse(sentiment),
+          }
+        });
+        try {
+          // Store data in DynamoDB
+          await docClient.send(command);
+          console.log(team + " sentiment updated");
+
+        } catch (err) {
+          console.error("Error saving data: ", err);
+        }
+
     }
     
     
@@ -48,7 +75,6 @@ export const handler = async (event) => {
   console.log(JSON.stringify(event));
   const response = {
     statusCode: 200,
-    body: JSON.stringify('Arsenal thrash west ham!'),
   };
   return response;
 };
