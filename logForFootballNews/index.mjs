@@ -8,7 +8,76 @@ import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 const client = new DynamoDBClient({ region: "us-east-1" }); // AWS region
 const docClient = DynamoDBDocumentClient.from(client);
 
+// API URL
+const apiUrl = 'https://newsapi.org/v2/everything';
+
+// Function to create dynamic API parameters
+const createApiParams = (query) => ({
+  q: query,
+  sortBy: 'popularity',
+  language: 'en',
+  apiKey: 'bc1697d5f460435fbf9be668688ee620', // API key 
+});
+
+
 export const handler = async (event) => {
+  
+  const makeApiCall = async (query) => {
+  try {
+    // Create dynamic parameters based on the query
+    const params = createApiParams(query);
+
+    // Make a GET request using axios
+    const response = await axios.get(apiUrl, { params });
+    
+     // Handle the API response
+    const articles = response.data?.articles;
+    if (articles?.length) {
+      articles.map(async (article) => {
+        const dateString = article.publishedAt
+        const dateInMilliSeconds = convertDateToMilliseconds(dateString)
+
+      // Saving articles to FootballNews Table 
+        const command = new PutCommand({
+          TableName: "FootballNews",
+          Item: {
+            "MatchTS": dateInMilliSeconds,
+            "News": article.title,
+            "TeamName": query,
+            "Url": article.url
+          }
+        })
+        try {
+          // Store data in DynamoDB
+          await docClient.send(command);
+          console.log(query + " updated");
+
+        } catch (err) {
+          console.error("Error saving data: ", err);
+        }
+
+      })
+    }
+  } catch (error) {
+    // Handle errors
+    console.error('News API Call Error: ', error);
+  }
+};
+
+// Function that converts date string to milliseconds
+function convertDateToMilliseconds(dateString) {
+  const dateInMilliSeconds = new Date(dateString).getTime();
+  return dateInMilliSeconds;
+}
+
+
+// API calls for different football teams
+makeApiCall("Arsenal FC");
+makeApiCall("Chelsea FC");
+makeApiCall("Liverpool FC");
+makeApiCall("Manchester United");
+makeApiCall("Manchester City FC");
+  
   //Extract data from event
   for(let record of event.Records){
     if(record.eventName === "INSERT"){
@@ -20,6 +89,7 @@ export const handler = async (event) => {
     
     //Extract team
     const team = record.dynamodb.NewImage.TeamName.S;
+      
       
    
     //Process news text for sentiment
@@ -39,8 +109,6 @@ export const handler = async (event) => {
     console.log(`Timestamp: ${timestamp}\n`);
     console.log(`Teamname: ${team}\n`);
       
-          
-    //USe Wee 19 code, if you like...
       
     //Have sentiment, team and timstamp  
     const sentiment = JSON.stringify(response.data.label);
@@ -48,7 +116,7 @@ export const handler = async (event) => {
 
       
       
-      //Save in new table 
+      //Save result in Sentiment table 
       const command = new PutCommand({
           TableName: "Sentiment",
           Item: {
