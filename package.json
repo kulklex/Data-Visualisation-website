@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node AwsLambda.js"
+    "start": "node News.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.506.0",

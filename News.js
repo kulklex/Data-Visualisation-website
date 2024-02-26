@@ -40,6 +40,7 @@ const makeApiCall = (query) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Create dynamic parameters based on the query
         const params = createApiParams(query);
+        const url = `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=bc1697d5f460435fbf9be668688ee620`;
         // Make a GET request using axios
         const response = yield axios_1.default.get(apiUrl, { params });
         // Handle the API response
