@@ -7,7 +7,7 @@ import fs from 'fs';
 
 // AWS DynamoDB imports
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, DynamoDBDocumentClient} from "@aws-sdk/lib-dynamodb";
 
 // Configure AWS DynamoDB client
 const client = new DynamoDBClient({ region: "us-east-1" }); // AWS region
@@ -81,23 +81,6 @@ async function addData(data: Football, home = true): Promise<void> {
     }
 }
 
-// Function that executes the scan operation
-async function scanFootballTeams(partitionKey: string): Promise<void> {
-    console.log("Scanning " + partitionKey + " Items........")
-    try {
-        // Execute the scan command
-        const command = new ScanCommand({ TableName: "FootballMatches" });
-        const response = await docClient.send(command);
-
-        // Filter the results to include only items with the specified partition key value
-        const filteredItems = response.Items?.filter((item: Record<string, any>) => item.TeamName === partitionKey);
-
-        // Output the filtered items
-        console.log('Filtered items:', filteredItems);
-    } catch (error) {
-        console.error('Error scanning DynamoDB:', error);
-    }
-}
 
 // Converts UK date to US date
 function ukToUsDate(date: string): string {
@@ -156,5 +139,3 @@ function calculateSingleNumber(goalDifference: number): number {
 // Execute the script
 readAndStoreFootballData();
 
-
-scanFootballTeams("Manchester City")

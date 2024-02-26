@@ -77,25 +77,6 @@ function addData(data, home = true) {
         }
     });
 }
-// Function that executes the scan operation
-function scanFootballTeams(partitionKey) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log("Scanning " + partitionKey + " Items........");
-        try {
-            // Execute the scan command
-            const command = new lib_dynamodb_1.ScanCommand({ TableName: "FootballMatches" });
-            const response = yield docClient.send(command);
-            // Filter the results to include only items with the specified partition key value
-            const filteredItems = (_a = response.Items) === null || _a === void 0 ? void 0 : _a.filter((item) => item.TeamName === partitionKey);
-            // Output the filtered items
-            console.log('Filtered items:', filteredItems);
-        }
-        catch (error) {
-            console.error('Error scanning DynamoDB:', error);
-        }
-    });
-}
 // Converts UK date to US date
 function ukToUsDate(date) {
     // Split date
@@ -161,4 +142,3 @@ function calculateSingleNumber(goalDifference) {
 }
 // Execute the script
 readAndStoreFootballData();
-scanFootballTeams("Manchester City");
