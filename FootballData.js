@@ -122,19 +122,19 @@ function calculateSingleNumber(goalDifference) {
         return 5; // Win by five or more goals
     }
     else if (goalDifference === -1) {
-        return -1; // Lose by one goal
+        return 11; // Lose by one goal
     }
     else if (goalDifference === -2) {
-        return -2; // Lose by two goals
+        return 12; // Lose by two goals
     }
     else if (goalDifference === -3) {
-        return -3; // Lose by three goals
+        return 13; // Lose by three goals
     }
     else if (goalDifference === -4) {
-        return -4; // Lose by four goals
+        return 14; // Lose by four goals
     }
     else if (goalDifference <= -5) {
-        return -5; // Lose by five or more goals
+        return 15; // Lose by five or more goals
     }
     else {
         return NaN;
