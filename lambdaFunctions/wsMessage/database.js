@@ -1,15 +1,18 @@
 //Import library and scan command
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, ScanCommand, DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 //Create client
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
+// All the teams
+// const Teams = ["Arsenal", "Chelsea", "Liverpool", "Manchester City", "Manchester United"];
+
 //Returns all of the connection IDs
 export async function getConnectionIds() {
     const scanCommand = new ScanCommand({
-        TableName: "WebSocketClients"
+        TableName: "WebSocket"
     });
     
     const response  = await docClient.send(scanCommand);
@@ -22,7 +25,7 @@ export async function deleteConnectionId(connectionId){
     console.log("Deleting connection Id: " + connectionId);
 
     const deleteCommand = new DeleteCommand ({
-        TableName: "WebSocketClients",
+        TableName: "WebSocket",
         Key: {
             ConnectionId: connectionId
         }
@@ -30,33 +33,42 @@ export async function deleteConnectionId(connectionId){
     return docClient.send(deleteCommand);
 }
 
-export async function getData(team){
+
+//Returns all Match Results
+export async function getTeamResults() {
+    const command = new ScanCommand({ 
+        TableName: "FootballMatches"
+    });
     
-    //Database query for arseal
+    const response  = await docClient.send(command);
+    return response.Items.splice(0, 4000);
+}
+
+
+export async function getData(){
     
-    // let xArray = results.Items.map( item => item.Timestampo)
+    const results = await getTeamResults();
+    
+    let xArray = results?.map( item => {
+        const timestamp = item.MatchTS; // Timestamp in milliseconds
+        const date = new Date(timestamp);
+        return date.toISOString().slice(0, 19).replace('T', ' ');
+    });
+    let yArray = results?.map( item => item.Score);
     
     let data = {
-        team: {
-            actual: {
-                x: [1,2,3,4],
-                y: [3,4,5,6]
-            },
-            // predicted: {
-            //     x: [4,3,2,1],
-            //     y: [6,5,4,3]
-            // }
+        actual: {
+            x: xArray,
+            y: yArray,
+            type: "scatter"
         }
     };
-
+    console.log(data);
     // Data gotten from the database
     return data;
-    
-    
 }
 
-const Teams = ["Arsenal", "Chelsea", "Liverpool", "Manchester City", "Manchester United"];
 
-for (const team in Teams) {
-    getData(team);
-}
+// for (const team in Teams) {
+//     getData(team);
+// }

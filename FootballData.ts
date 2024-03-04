@@ -14,7 +14,7 @@ const client = new DynamoDBClient({ region: "us-east-1" }); // AWS region
 const docClient = DynamoDBDocumentClient.from(client);
 
 // All football teams
-const FootballTeams = ["Arsenal", "Selected Club", "Manchester City", "Manchester Utd", "Liverpool"];
+const FootballTeams = ["Arsenal", "Chelsea", "Manchester City", "Manchester Utd", "Liverpool"];
 
 // Structure of data that we want to read
 interface Football {

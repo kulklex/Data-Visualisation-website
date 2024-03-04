@@ -24,7 +24,7 @@ const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const client = new client_dynamodb_1.DynamoDBClient({ region: "us-east-1" }); // AWS region
 const docClient = lib_dynamodb_1.DynamoDBDocumentClient.from(client);
 // All football teams
-const FootballTeams = ["Arsenal", "Selected Club", "Manchester City", "Manchester Utd", "Liverpool"];
+const FootballTeams = ["Arsenal", "Chelsea", "Manchester City", "Manchester Utd", "Liverpool"];
 // Read file
 function readAndStoreFootballData() {
     return __awaiter(this, void 0, void 0, function* () {
