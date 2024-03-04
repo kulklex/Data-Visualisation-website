@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket</title>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+<h1>Messages from Server</h1>
+<p style="border-style: solid; width: 500px; border-width: 1px;" id="messages"></p>
+
+<script>
+    //Open connection
+    let connection = new WebSocket("wss://3b588j212a.execute-api.us-east-1.amazonaws.com/production");
+
+    //Log connected response
+    connection.onopen = function(event){
+        sendMessage()
+        console.log("Connected: " + JSON.stringify(event));
+    };
+
+    //Output messages from the server
+    connection.onmessage = function(msg){
+        document.getElementById("messages").innerHTML += ("Server message: " + msg.data + "<br />");
+        console.log("Message received.");
+    }
+
+    //Log errors
+    connection.onerror = function (error) {
+        console.log("WebSocket Error: " + JSON.stringify(error));
+    }
+
+    //Send message to server
+    function sendMessage(){
+
+        //Create message to be sent to server
+        let msgObject = {
+          action: "sendMessage",//Used for routing in API Gateway
+          data: ''
+        };
+
+        //Send message
+        connection.send(JSON.stringify(msgObject));
+
+        //Log result
+        console.log("Message sent: " + JSON.stringify(msgObject));
+    }
+
+
+</script>
+</body>
+</html>
