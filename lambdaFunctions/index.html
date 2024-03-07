@@ -25,7 +25,6 @@
         
         //Output messages from the server
         connection.onmessage = function (msg) {
-            console.log(msg);
             const result = JSON.parse(msg.data).actual
             var data = [
                 {
