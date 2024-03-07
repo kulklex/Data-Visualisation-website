@@ -3,13 +3,17 @@ import { sendMessage } from './websocket.mjs'
 import { getData } from './database.mjs';
 
 export const handler = async (event) => {
-    //console.log(JSON.stringify(event));
+    console.log(JSON.stringify(event));
     try {
         //Get connection ID from event
         let connId = event.requestContext.connectionId;
-        
-        const data = await getData();
 
+        // Extract team name from the incoming message
+        const body = JSON.parse(event.body);
+        const teamName = body.data;
+        
+        const data = await getData(teamName);
+        
         //Extract domain and stage from event
         const domain = event.requestContext.domainName;
         const stage = event.requestContext.stage;
@@ -19,7 +23,7 @@ export const handler = async (event) => {
         let result = await sendMessage(JSON.stringify(data), connId, domain, stage);
         console.log(JSON.stringify(result));
     }
-    catch(err){
+    catch (err) {
         return { statusCode: 500, body: "Error: " + JSON.stringify(err) };
     }
 

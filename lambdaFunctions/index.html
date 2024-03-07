@@ -8,22 +8,24 @@
 
 <body>
 
-    <h1>Messages from Server</h1>
-
+    <h1>Arsenal data from Server</h1>
+   
     <div id="tester"></div>
 
     <script>
         //Open connection
         let connection = new WebSocket("wss://3b588j212a.execute-api.us-east-1.amazonaws.com/production");
-
+        
+       
         //Log connected response
         connection.onopen = function (event) {
             sendMessage()
             console.log("Connected: " + JSON.stringify(event));
         };
-
+        
         //Output messages from the server
         connection.onmessage = function (msg) {
+            console.log(msg);
             const result = JSON.parse(msg.data).actual
             var data = [
                 {
@@ -32,7 +34,6 @@
                     type: 'scatter'
                 }
             ];
-            console.log(data)
             Plotly.newPlot(document.getElementById('tester'), data);
 
             console.log("Message received.");

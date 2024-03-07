@@ -6,25 +6,23 @@ import { DynamoDBDocumentClient, ScanCommand, DeleteCommand, QueryCommand } from
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-// All the teams
-// const Teams = ["Arsenal", "Chelsea", "Liverpool", "Manchester City", "Manchester United"];
 
 //Returns all of the connection IDs
 export async function getConnectionIds() {
     const scanCommand = new ScanCommand({
         TableName: "WebSocket"
     });
-    
-    const response  = await docClient.send(scanCommand);
+
+    const response = await docClient.send(scanCommand);
     return response.Items;
 }
 
 
 //Deletes the specified connection ID
-export async function deleteConnectionId(connectionId){
+export async function deleteConnectionId(connectionId) {
     console.log("Deleting connection Id: " + connectionId);
 
-    const deleteCommand = new DeleteCommand ({
+    const deleteCommand = new DeleteCommand({
         TableName: "WebSocket",
         Key: {
             ConnectionId: connectionId
@@ -33,29 +31,32 @@ export async function deleteConnectionId(connectionId){
     return docClient.send(deleteCommand);
 }
 
-
 //Returns all Match Results
-export async function getTeamResults() {
-    const command = new ScanCommand({ 
-        TableName: "FootballMatches"
+export async function getTeamResults(team) {
+    const command = new QueryCommand({
+        TableName: "FootballMatches",
+        KeyConditionExpression: "TeamName = :teamName",
+        ExpressionAttributeValues: {
+            ":teamName": team
+        },
     });
-    
-    const response  = await docClient.send(command);
-    return response.Items.splice(0, 4000);
+
+    const response = await docClient.send(command);
+    return response.Items;
 }
 
 
-export async function getData(){
-    
-    const results = await getTeamResults();
-    
-    let xArray = results?.map( item => {
-        const timestamp = item.MatchTS; // Timestamp in milliseconds
+export async function getData(teamName) {
+    const results = await getTeamResults(teamName);
+
+    let xArray = results?.map(item => {
+        // convert timestamp in millisecs to usable date format
+        const timestamp = item.MatchTS;
         const date = new Date(timestamp);
         return date.toISOString().slice(0, 19).replace('T', ' ');
     });
-    let yArray = results?.map( item => item.Score);
-    
+    let yArray = results?.map(item => item.Score);
+
     let data = {
         actual: {
             x: xArray,
@@ -63,12 +64,6 @@ export async function getData(){
             type: "scatter"
         }
     };
-    console.log(data);
-    // Data gotten from the database
+
     return data;
 }
-
-
-// for (const team in Teams) {
-//     getData(team);
-// }
