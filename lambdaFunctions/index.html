@@ -8,24 +8,48 @@
 
 <body>
 
-    <h1>Arsenal data from Server</h1>
-   
-    <div id="tester"></div>
+    <h4>Arsenal FC last 50 games</h4>
+    <div id="Arsenal"></div>
+
+    <h4>Chelsea FC last 50 games</h4>
+    <div id="Chelsea"></div>
+
+    <h4>Liverpool FC last 50 games</h4>
+    <div id="Liverpool"></div>
+
+    <h4>Manchester Utd FC last 50 games</h4>
+    <div id="Manchester Utd"></div>
+
+    <h4>Manchester City FC last 50 games</h4>
+    <div id="Manchester City"></div>
 
     <script>
         //Open connection
         let connection = new WebSocket("wss://3b588j212a.execute-api.us-east-1.amazonaws.com/production");
-        
-       
+
+
         //Log connected response
         connection.onopen = function (event) {
-            sendMessage()
+            // Send messages to request data for each team
+            sendMessage('Arsenal');
+            sendMessage('Chelsea');
+            sendMessage('Liverpool');
+            sendMessage('Manchester City');
+            sendMessage('Manchester Utd');
+            
+            // Log connection
             console.log("Connected: " + JSON.stringify(event));
         };
-        
+
         //Output messages from the server
         connection.onmessage = function (msg) {
-            const result = JSON.parse(msg.data).actual
+            const response = JSON.parse(msg.data)
+
+            // Get the actual data based on structure created
+            const result = response.actual
+            
+            // Get teams (stored as id)
+            const teamName = response.id
             var data = [
                 {
                     x: result.x,
@@ -33,7 +57,7 @@
                     type: 'scatter'
                 }
             ];
-            Plotly.newPlot(document.getElementById('tester'), data);
+            Plotly.newPlot(document.getElementById(teamName), data);
 
             console.log("Message received.");
         }
@@ -44,12 +68,12 @@
         }
 
         //Send message to server
-        function sendMessage() {
+        function sendMessage(teamName) {
 
             //Create message to be sent to server
             let msgObject = {
                 action: "sendMessage",//Used for routing in API Gateway
-                data: 'Arsenal'
+                data: teamName
             };
 
             //Send message

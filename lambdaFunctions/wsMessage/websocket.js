@@ -13,7 +13,7 @@ export async function sendMessage(message, connId, domain, stage) {
     //Try to send message to connected clients
 
     try {
-        console.log("Sending message '" + message + "' to: " + connId);
+        console.log("Sending '" + message + "' to: " + connId);
 
         //Create post to connection command
         const postToConnectionCommand = new PostToConnectionCommand({

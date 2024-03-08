@@ -12,6 +12,10 @@ export const handler = async (event) => {
         const body = JSON.parse(event.body);
         const teamName = body.data;
         
+        // Using team name sent from the clientside
+        const requestId = teamName; 
+        
+        // Fetch data based on the team name
         const data = await getData(teamName);
         
         //Extract domain and stage from event
@@ -19,8 +23,8 @@ export const handler = async (event) => {
         const stage = event.requestContext.stage;
         console.log("Domain: " + domain + " stage: " + stage);
 
-        //Get promises to send messages to connected clients
-        let result = await sendMessage(JSON.stringify(data), connId, domain, stage);
+        //Get promises to send the data and the requestId to connected clients
+        let result = await sendMessage(JSON.stringify({...data, id: requestId}), connId, domain, stage);
         console.log(JSON.stringify(result));
     }
     catch (err) {

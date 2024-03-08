@@ -44,8 +44,8 @@ export async function getTeamResults(team) {
     const response = await docClient.send(command);
     const result = response.Items;
     
-    // Returning the last 190 matches 
-    return result.slice(Math.max(result.length - 190, 0));
+    // Returning the last 50 matches 
+    return result.slice(Math.max(result.length - 50, 0));
 }
 
 
