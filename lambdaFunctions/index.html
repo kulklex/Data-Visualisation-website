@@ -8,19 +8,19 @@
 
 <body>
 
-    <h4>Arsenal FC last 50 games</h4>
+    <h4>Arsenal FC last 50 games and next 10 games</h4>
     <div id="Arsenal"></div>
 
-    <h4>Chelsea FC last 50 games</h4>
+    <h4>Chelsea FC last 50 games and next 10 games</h4>
     <div id="Chelsea"></div>
 
-    <h4>Liverpool FC last 50 games</h4>
+    <h4>Liverpool FC last 50 games and next 10 games</h4>
     <div id="Liverpool"></div>
 
-    <h4>Manchester Utd FC last 50 games</h4>
+    <h4>Manchester Utd FC last 50 games and next 10 games</h4>
     <div id="Manchester Utd"></div>
 
-    <h4>Manchester City FC last 50 games</h4>
+    <h4>Manchester City FC last 50 games and next 10 games</h4>
     <div id="Manchester City"></div>
 
     <script>
@@ -46,17 +46,33 @@
             const response = JSON.parse(msg.data)
 
             // Get the actual data based on structure created
-            const result = response.actual
+            const actualResult = response.actual
+
+            // Get the predicted data based on structure created
+            const predictedResult = response.predicted
             
+            // Create a trace based on the actual data
+            const trace1 = {
+                x: actualResult.x,
+                y: actualResult.y,
+                model: 'lines+markers',
+                name: 'Actual Result'
+            }
+
+            // Create another trace based on the predicted data
+            const trace2 = {
+                x: predictedResult.x,
+                y: predictedResult.y,
+                model: 'lines+markers',
+                name: 'Predicted Result'
+            }
+
             // Get teams (stored as id)
             const teamName = response.id
-            var data = [
-                {
-                    x: result.x,
-                    y: result.y,
-                    type: 'scatter'
-                }
-            ];
+
+            // Store both traces and plot both graphs
+            const data = [trace1, trace2];
+
             Plotly.newPlot(document.getElementById(teamName), data);
 
             console.log("Message received.");

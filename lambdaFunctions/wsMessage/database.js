@@ -43,7 +43,7 @@ export async function getTeamResults(team) {
 
     const response = await docClient.send(command);
     const result = response.Items;
-    
+
     // Returning the last 50 matches 
     return result.slice(Math.max(result.length - 50, 0));
 }
@@ -64,6 +64,22 @@ export async function getData(teamName) {
         actual: {
             x: xArray,
             y: yArray,
+            type: "scatter"
+        },
+        predicted: {
+            x: [
+                '2023-09-01',
+                '2023-10-04',
+                '2023-11-06',
+                '2023-12-09',
+                '2024-01-11',
+                '2024-02-13',
+                '2024-03-17',
+                '2024-04-19',
+                '2024-05-22',
+                '2024-06-24'
+            ],
+            y: [1, 2, 2, 3, 2, 2, 4, 5],
             type: "scatter"
         }
     };
