@@ -29,19 +29,19 @@
     </h1>
 
     <h4>Arsenal FC last 50 games and next 10 games</h4>
-    <div class="Arsenal"></div>
+    <div id="Arsenal FC"></div>
 
     <h4>Chelsea FC last 50 games and next 10 games</h4>
-    <div class="Chelsea"></div>
+    <div id="Chelsea FC"></div>
 
     <h4>Liverpool FC last 50 games and next 10 games</h4>
-    <div class="Liverpool"></div>
+    <div id="Liverpool FC"></div>
 
     <h4>Manchester Utd FC last 50 games and next 10 games</h4>
-    <div class="Manchester Utd"></div>
+    <div id="Manchester Utd FC"></div>
 
     <h4>Manchester City FC last 50 games and next 10 games</h4>
-    <div class="Manchester City"></div>
+    <div id="Manchester City FC"></div>
 
     <script>
         //Open connection
@@ -66,26 +66,26 @@
             const response = JSON.parse(msg.data)
 
             // Get the actual data
-            const actualResult = response.actual
+            const actualResult = response.actual;
 
             // Get the predicted data
-            const predictedResult = response.predicted
+            const predictedResult = response.predicted;
 
             // Get teams (stored as id)
-            const teamName = response.id
+            const teamName = response.id;
             
             // Get the sentiment data
-            const sentiments = response.sentiments
-            console.log('Sentiment: ' + sentiments);
+            const sentiments = response.sentiments[0];
 
-
-            let posCount, negCount, neutralCount;
-    
-            for (let sentiment in sentiments) {
-                if (sentiment === "pos") {posCount++}
-                if (sentiment === "neg") {negCount++}
-                if (sentiment === "neutral") {neutralCount++}
-            }
+            let posCount = 0;
+            let negCount = 0;
+            let neutralCount = 0;
+            
+            sentiments.forEach(sentiment => {
+                if (sentiment == "pos") ++posCount
+                else if (sentiment == "neg") ++negCount
+                else if (sentiment == "neutral") ++neutralCount
+            });
 
             // Create a trace based on the actual data
             const trace1 = {
@@ -112,13 +112,17 @@
                     type: 'pie'
                  }] 
 
+                 var layout = {
+                    height: 400,
+                    width: 500
+                }
             // Store both football data traces and plot football graphs
             const data = [trace1, trace2];
             Plotly.newPlot(document.getElementById(teamName), data);
 
 
             // Plot sentiment pie chart
-            Plotly.newPlot(document.getElementsByClassName(teamName), sentimentData);
+            Plotly.newPlot(document.getElementById(teamName+" FC"), sentimentData, layout);
 
             console.log("Message received.");
         }
