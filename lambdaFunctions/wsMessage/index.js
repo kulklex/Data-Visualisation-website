@@ -1,6 +1,6 @@
 //Import external library with websocket functions
 import { sendMessage } from './websocket.mjs'
-import { getData } from './database.mjs';
+import { getData, getSentiments } from './database.mjs';
 
 export const handler = async (event) => {
     console.log(JSON.stringify(event));
@@ -11,20 +11,21 @@ export const handler = async (event) => {
         // Extract team name from the incoming message
         const body = JSON.parse(event.body);
         const teamName = body.data;
-        
+
         // Using team name sent from the clientside
-        const requestId = teamName; 
-        
+        const requestId = teamName;
+
         // Fetch data based on the team name
         const data = await getData(teamName);
-        
+        const sentiments = await getSentiments(teamName);
+
         //Extract domain and stage from event
         const domain = event.requestContext.domainName;
         const stage = event.requestContext.stage;
         console.log("Domain: " + domain + " stage: " + stage);
 
         //Get promises to send the data and the requestId to connected clients
-        let result = await sendMessage(JSON.stringify({...data, id: requestId}), connId, domain, stage);
+        let result = await sendMessage(JSON.stringify({ ...data, id: requestId, sentiments }), connId, domain, stage);
         console.log(JSON.stringify(result));
     }
     catch (err) {

@@ -31,10 +31,10 @@ export async function deleteConnectionId(connectionId) {
     return docClient.send(deleteCommand);
 }
 
-//Returns all Match Results
-export async function getTeamResults(team) {
+//Returns results based on query
+export async function getQueryResults(team, tableName) {
     const command = new QueryCommand({
-        TableName: "FootballMatches",
+        TableName: tableName,
         KeyConditionExpression: "TeamName = :teamName",
         ExpressionAttributeValues: {
             ":teamName": team
@@ -44,13 +44,46 @@ export async function getTeamResults(team) {
     const response = await docClient.send(command);
     const result = response.Items;
 
-    // Returning the last 50 matches 
+    // Returning results for the last 50 matches 
     return result.slice(Math.max(result.length - 50, 0));
 }
 
+export async function getSentimentData(team) {
+    
+    // Creating a new variable based on stored values in DB
+    let sentimentTeam;
+    if (team === "Manchester Utd") {
+        sentimentTeam = "Manchester United";
+    }
+    else {
+        sentimentTeam = team + " FC";
+    }
 
+    const command = new QueryCommand({
+        TableName: "Sentiments",
+        KeyConditionExpression: "TeamName = :teamName",
+        ExpressionAttributeValues: {
+            ":teamName": sentimentTeam, // Pass the team name directly as a string
+        },
+    });
+
+    try {
+        const response = await docClient.send(command);
+        console.log("Team: " + team);
+        const result = response.Items;
+        return result;
+    }
+    catch (error) {
+        console.error("Error fetching sentiment data:", error);
+        throw error; // Or handle it as needed
+    }
+}
+
+
+
+// Fetch football teams results and process the data
 export async function getData(teamName) {
-    const results = await getTeamResults(teamName);
+    const results = await getQueryResults(teamName, "FootballMatches");
 
     let xArray = results?.map(item => {
         // convert timestamp in millisecs to usable date format
@@ -84,5 +117,16 @@ export async function getData(teamName) {
         }
     };
 
+    return data;
+}
+
+
+export async function getSentiments(teamName) {
+    const results = await getSentimentData(teamName);
+    console.log("Result at sentiemnt function: " + results);
+    const labels = results?.map(item => item.Result.label);
+
+    const data = [labels];
+    console.log("Data: " + data);
     return data;
 }

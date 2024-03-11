@@ -23,6 +23,26 @@
     <h4>Manchester City FC last 50 games and next 10 games</h4>
     <div id="Manchester City"></div>
 
+
+    <h1>
+        Sentiment Analysis
+    </h1>
+
+    <h4>Arsenal FC last 50 games and next 10 games</h4>
+    <div class="Arsenal"></div>
+
+    <h4>Chelsea FC last 50 games and next 10 games</h4>
+    <div class="Chelsea"></div>
+
+    <h4>Liverpool FC last 50 games and next 10 games</h4>
+    <div class="Liverpool"></div>
+
+    <h4>Manchester Utd FC last 50 games and next 10 games</h4>
+    <div class="Manchester Utd"></div>
+
+    <h4>Manchester City FC last 50 games and next 10 games</h4>
+    <div class="Manchester City"></div>
+
     <script>
         //Open connection
         let connection = new WebSocket("wss://3b588j212a.execute-api.us-east-1.amazonaws.com/production");
@@ -45,12 +65,28 @@
         connection.onmessage = function (msg) {
             const response = JSON.parse(msg.data)
 
-            // Get the actual data based on structure created
+            // Get the actual data
             const actualResult = response.actual
 
-            // Get the predicted data based on structure created
+            // Get the predicted data
             const predictedResult = response.predicted
+
+            // Get teams (stored as id)
+            const teamName = response.id
             
+            // Get the sentiment data
+            const sentiments = response.sentiments
+            console.log('Sentiment: ' + sentiments);
+
+
+            let posCount, negCount, neutralCount;
+    
+            for (let sentiment in sentiments) {
+                if (sentiment === "pos") {posCount++}
+                if (sentiment === "neg") {negCount++}
+                if (sentiment === "neutral") {neutralCount++}
+            }
+
             // Create a trace based on the actual data
             const trace1 = {
                 x: actualResult.x,
@@ -67,13 +103,22 @@
                 name: 'Predicted Result'
             }
 
-            // Get teams (stored as id)
-            const teamName = response.id
 
-            // Store both traces and plot both graphs
+            // Create a trace for the sentiment analysis
+            const sentimentData = 
+                [{
+                    values: [posCount, neutralCount, negCount],
+                    labels: ['Positive', 'Neutral', 'Negative'],
+                    type: 'pie'
+                 }] 
+
+            // Store both football data traces and plot football graphs
             const data = [trace1, trace2];
-
             Plotly.newPlot(document.getElementById(teamName), data);
+
+
+            // Plot sentiment pie chart
+            Plotly.newPlot(document.getElementsByClassName(teamName), sentimentData);
 
             console.log("Message received.");
         }
