@@ -123,10 +123,8 @@ export async function getData(teamName) {
 
 export async function getSentiments(teamName) {
     const results = await getSentimentData(teamName);
-    console.log("Result at sentiemnt function: " + results);
     const labels = results?.map(item => item.Result.label);
 
     const data = [labels];
-    console.log("Data: " + data);
     return data;
 }
