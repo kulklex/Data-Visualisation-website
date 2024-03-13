@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Data Visualisation Website</title>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js" charset="utf-8"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="container">
+
+    <p class="text-extrabold text-3xl p-6">
+        Actual and Predicted Data Visualisation
+    </p>
+    <div>
+        <div id="Arsenal"></div>
+        <div id="Chelsea"></div>
+        <div id="Liverpool"></div>
+        <div id="Manchester Utd"></div>
+        <div id="Manchester City"></div>
+    </div>
+
+    <p class="text-extrabold text-3xl p-6">
+        Sentiment Analysis
+    </p>
+    <div class="grid grid-cols-2 p-1">
+        <div id="Arsenal FC"></div>
+        <div id="Chelsea FC"></div>
+        <div id="Liverpool FC"></div>
+        <div id="Manchester Utd FC"></div>
+        <div id="Manchester City FC"></div>
+    </div>
+
+    <script>
+        //Open connection
+        let connection = new WebSocket("wss://3b588j212a.execute-api.us-east-1.amazonaws.com/production");
+
+
+        //Log connected response
+        connection.onopen = function (event) {
+            // Send messages to request data for each team
+            sendMessage('Arsenal');
+            sendMessage('Chelsea');
+            sendMessage('Liverpool');
+            sendMessage('Manchester City');
+            sendMessage('Manchester Utd');
+
+            // Log connection
+            console.log("Connected: " + JSON.stringify(event));
+        };
+
+        //Output messages from the server
+        connection.onmessage = function (msg) {
+            const response = JSON.parse(msg.data)
+
+            // Get the actual data
+            const actualResult = response.actual;
+
+            // Get the predicted data
+            const predictedResult = response.predicted;
+
+            // Get teams (stored as id)
+            const teamName = response.id;
+
+            // Get the sentiment data
+            const sentiments = response.sentiments[0];
+
+            let posCount = 0;
+            let negCount = 0;
+            let neutralCount = 0;
+
+            // Get the number of each particular sentiment
+            sentiments.forEach(sentiment => {
+                if (sentiment == "pos") ++posCount
+                else if (sentiment == "neg") ++negCount
+                else if (sentiment == "neutral") ++neutralCount
+            });
+
+            // Create a trace based on the actual data
+            const trace1 = {
+                x: actualResult.x,
+                y: actualResult.y,
+                model: 'lines+markers',
+                name: 'Actual Result'
+            }
+
+            // Create another trace based on the predicted data
+            const trace2 = {
+                x: predictedResult.x,
+                y: predictedResult.y,
+                model: 'lines+markers',
+                name: 'Predicted Result'
+            }
+
+
+            // Create a trace for the sentiment analysis
+            const sentimentData =
+                [{
+                    values: [posCount, neutralCount, negCount],
+                    labels: ['Positive', 'Neutral', 'Negative'],
+                    type: 'pie'
+                }]
+
+            
+            // Creating layout for line charts    
+            let layout = {
+                title: teamName + "'s Last 50 games and Next 10 Games Prediction"
+            }
+
+
+            // Store both football data traces and plot football graphs
+            const data = [trace1, trace2];
+            Plotly.newPlot(document.getElementById(teamName), data, layout);
+
+
+            // Editing layout for pie charts
+            layout = {
+                title: teamName + " Sentiment Analysis",
+                height: 400,
+                width: 500
+            }
+
+            // Plot sentiment pie charts
+            Plotly.newPlot(document.getElementById(teamName + " FC"), sentimentData, layout);
+
+            console.log("Message received.");
+        }
+
+        //Log errors
+        connection.onerror = function (error) {
+            console.log("WebSocket Error: " + JSON.stringify(error));
+        }
+
+        //Send message to server
+        function sendMessage(teamName) {
+
+            //Create message to be sent to server
+            let msgObject = {
+                action: "sendMessage",//Used for routing in API Gateway
+                data: teamName
+            };
+
+            //Send message
+            connection.send(JSON.stringify(msgObject));
+
+            //Log result
+            console.log("Message sent: " + JSON.stringify(msgObject));
+        }
+
+
+    </script>
+</body>
+
+</html>
