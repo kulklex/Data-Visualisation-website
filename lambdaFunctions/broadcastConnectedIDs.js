@@ -10,7 +10,7 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     //Get Message from event
     const msg = JSON.parse(event.body).data;
