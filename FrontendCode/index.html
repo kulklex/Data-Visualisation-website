@@ -41,7 +41,8 @@
                 <div id="Manchester Utd"></div>
                 <div id="Manchester City"></div>
             </div>
-            <hr></hr>
+            <hr>
+            </hr>
             <p class="text-extrabold text-3xl p-6">
                 Sentiment Analysis
             </p>
@@ -79,75 +80,82 @@
         connection.onmessage = function (msg) {
             const response = JSON.parse(msg.data)
 
-            // Get the actual data
-            const actualResult = response.actual;
+            if (response.predicted || response.actual) {
 
-            // Get the predicted data
-            const predictedResult = response.predicted;
+                // Get the actual data
+                const actualResult = response.actual;
 
-            // Get teams (stored as id)
-            const teamName = response.id;
+                // Get the predicted data
+                const predictedResult = response.predicted;
 
-            // Get the sentiment data
-            const sentiments = response.sentiments[0];
+                // Get teams (stored as id)
+                const teamName = response.id;
 
-            let posCount = 0;
-            let negCount = 0;
-            let neutralCount = 0;
+                // Create a trace based on the actual data
+                const trace1 = {
+                    x: actualResult.x,
+                    y: actualResult.y,
+                    model: 'lines+markers',
+                    name: 'Actual Result'
+                }
 
-            // Get the number of each particular sentiment
-            sentiments.forEach(sentiment => {
-                if (sentiment == "pos") ++posCount
-                else if (sentiment == "neg") ++negCount
-                else if (sentiment == "neutral") ++neutralCount
-            });
+                // Create another trace based on the predicted data
+                const trace2 = {
+                    x: predictedResult.x,
+                    y: predictedResult.y,
+                    model: 'lines+markers',
+                    name: 'Predicted Result'
+                }
 
-            // Create a trace based on the actual data
-            const trace1 = {
-                x: actualResult.x,
-                y: actualResult.y,
-                model: 'lines+markers',
-                name: 'Actual Result'
+                if (response.sentiments) {
+                    // Get the sentiment data
+                    const sentiments = response.sentiments[0];
+
+                    let posCount = 0;
+                    let negCount = 0;
+                    let neutralCount = 0;
+
+                    // Get the number of each particular sentiment
+                    sentiments.forEach(sentiment => {
+                        if (sentiment == "pos") ++posCount
+                        else if (sentiment == "neg") ++negCount
+                        else if (sentiment == "neutral") ++neutralCount
+                    });
+
+
+                    // Create a trace for the sentiment analysis
+                    const sentimentData =
+                        [{
+                            values: [posCount, neutralCount, negCount],
+                            labels: ['Positive', 'Neutral', 'Negative'],
+                            type: 'pie'
+                        }]
+
+
+                    // Creating layout for pie charts
+                    let layoutS = {
+                        title: teamName + " Sentiment Analysis",
+                        height: 400,
+                        width: 500
+                    }
+
+                    // Plot sentiment pie charts
+                    Plotly.newPlot(document.getElementById(teamName + " FC"), sentimentData, layoutS);
+                }
+
+                // Creating layout for line charts    
+                let layout = {
+                    title: teamName + "'s Last 50 games and Next 10 Games Prediction"
+                }
+
+
+                // Store both football data traces and plot football graphs
+                const data = [trace1, trace2];
+                Plotly.newPlot(document.getElementById(teamName), data, layout);
+
             }
 
-            // Create another trace based on the predicted data
-            const trace2 = {
-                x: predictedResult.x,
-                y: predictedResult.y,
-                model: 'lines+markers',
-                name: 'Predicted Result'
-            }
-
-
-            // Create a trace for the sentiment analysis
-            const sentimentData =
-                [{
-                    values: [posCount, neutralCount, negCount],
-                    labels: ['Positive', 'Neutral', 'Negative'],
-                    type: 'pie'
-                }]
-
-
-            // Creating layout for line charts    
-            let layout = {
-                title: teamName + "'s Last 50 games and Next 10 Games Prediction"
-            }
-
-
-            // Store both football data traces and plot football graphs
-            const data = [trace1, trace2];
-            Plotly.newPlot(document.getElementById(teamName), data, layout);
-
-
-            // Editing layout for pie charts
-            layout = {
-                title: teamName + " Sentiment Analysis",
-                height: 400,
-                width: 500
-            }
-
-            // Plot sentiment pie charts
-            Plotly.newPlot(document.getElementById(teamName + " FC"), sentimentData, layout);
+            console.log("Data: ", response);
 
             console.log("Message received.");
         }

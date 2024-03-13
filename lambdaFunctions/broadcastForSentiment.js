@@ -19,7 +19,7 @@ export const handler = async (event) => {
   for(let record of event.Records){
     if(record.eventName === "INSERT"){
       //Extract data from event
-      const score = record.dynamodb.NewImage.Score.N;
+      const results = record.dynamodb.NewImage.Result.M;
       
       //Extract timestamp
       const timestamp = record.dynamodb.NewImage.MatchTS.N;
@@ -27,7 +27,7 @@ export const handler = async (event) => {
       //Extract team
       const team = record.dynamodb.NewImage.TeamName.S;
       
-      data.push({score, timestamp, team});
+      data.push({results, timestamp, team});
     }
   }
 
@@ -36,7 +36,7 @@ export const handler = async (event) => {
 
     //Get promises to send messages to connected clients
     let sendMsgPromises = await getSendMessagePromises({
-      type: 'numerical',
+      type: 'text',
       data
     });
 
