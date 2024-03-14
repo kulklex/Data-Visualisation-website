@@ -47,8 +47,8 @@ function readAndStoreFootballData() {
     });
 }
 // Function to add data to DynamoDB
-function addData(data, home = true) {
-    return __awaiter(this, void 0, void 0, function* () {
+function addData(data_1) {
+    return __awaiter(this, arguments, void 0, function* (data, home = true) {
         const team = data[home ? 'Home' : 'Away'];
         if (FootballTeams.includes(team)) {
             // Convert date to US format
