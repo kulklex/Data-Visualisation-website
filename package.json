@@ -1,10 +1,11 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node DownloadSyntheticData.js"
+    "start": "node ConvertToCorrespondingDate.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.506.0",
+    "@aws-sdk/client-sagemaker-runtime": "^3.535.0",
     "@aws-sdk/lib-dynamodb": "^3.506.0",
     "aws-sdk": "^2.1549.0",
     "axios": "^1.6.7",

@@ -23,7 +23,7 @@ function downloadDataAndSaveToFile() {
             // Convert the JSON object to a string with pretty print
             const dataStr = JSON.stringify(data, null, 2);
             // Write the string to a file named data.json
-            yield fs_1.promises.writeFile('syntheticData.json', dataStr, 'utf8');
+            yield fs_1.promises.writeFile('synthetic_data.json', dataStr, 'utf8');
             console.log('Data saved to data.json');
         }
         catch (error) {
