@@ -31,7 +31,7 @@ function processAndSaveDataByTeam() {
                 };
                 // Create a single JSON object for the team
                 const dataStr = JSON.stringify(teamData, null, 2);
-                // Sanitize team name to be used in filename
+                // Create files using this naming convention
                 const fileName = `team_${teamName.replace(/\s+/g, '_')}.json`;
                 yield fs_1.promises.writeFile(fileName, dataStr, 'utf8');
                 console.log(`Processed data for ${teamName} saved to ${fileName}`);

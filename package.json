@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node DownloadFootballData.js"
+    "start": "node DownloadSyntheticData.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.506.0",
