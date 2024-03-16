@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node ConvertToCorrespondingDate.js"
+    "start": "node DownloadFootballData.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.506.0",
@@ -10,6 +10,7 @@
     "aws-sdk": "^2.1549.0",
     "axios": "^1.6.7",
     "csv-parser": "^3.0.0",
+    "date-fns": "^3.5.0",
     "dotenv": "^16.4.1"
   },
   "devDependencies": {

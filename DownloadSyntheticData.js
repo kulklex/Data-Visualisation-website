@@ -24,7 +24,6 @@ function downloadDataAndSaveToFile() {
             const dataStr = JSON.stringify(data, null, 2);
             // Write the string to a file named data.json
             yield fs_1.promises.writeFile('synthetic_data.json', dataStr, 'utf8');
-            console.log('Data saved to data.json');
         }
         catch (error) {
             console.error('Error downloading or saving the data:', error);

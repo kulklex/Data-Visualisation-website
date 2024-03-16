@@ -13,7 +13,6 @@ async function downloadDataAndSaveToFile(): Promise<void> {
         
         // Write the string to a file named data.json
         await fs.writeFile('synthetic_data.json', dataStr, 'utf8');
-        console.log('Data saved to data.json');
     } catch (error) {
         console.error('Error downloading or saving the data:', error);
     }

@@ -22,5 +22,5 @@ function decimalDayToDate(year, decimalDay) {
 }
 // Example usage
 const year = 2024;
-const decimalDay = 310.1735539288901;
+const decimalDay = 298.6503780343599;
 console.log(decimalDayToDate(year, decimalDay));
