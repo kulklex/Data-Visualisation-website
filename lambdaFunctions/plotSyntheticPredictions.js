@@ -1,5 +1,8 @@
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from "@aws-sdk/client-sagemaker-runtime"; 
+import axios from 'axios';
 
+//The ID of the student whose data you want to plot
+let url = 'https://y2gtfx0jg3.execute-api.us-east-1.amazonaws.com/prod/M00919866';
 const client = new SageMakerRuntimeClient({region: "us-east-1"});
 
 
@@ -18,19 +21,32 @@ export const handler = async (event) => {
     try {
         //Get synthetic data
         const results  = await invokeEndpoint();
-        let yValues = [];
-        //Add basic X values for plot
-        let xValues = [];
-        results?.map(result => {
-                yValues.push(result);
+      
+        //Add original y values for plot
+        let OriginalYValues = (await axios.get(url)).data.target;
+        //Add predicted mean x values for plot
+        let meanXValues = [];
+        //Add original X values for plot
+        let OriginalXValues = [];
+        for(let i=0; i<OriginalYValues.length; ++i){
+            OriginalXValues.push(i);
+        }
+    
+        //Add predicted mean y values for plot
+        let meanYValues = [];
+        results.predictions[0].mean?.map(result => {
+                meanYValues.push(result);
         });
         
-        for(let i=0; i<yValues.length; ++i){
-            xValues.push(i);
+        
+        for(let i=OriginalYValues.length; i<(OriginalYValues.length+meanYValues.length); ++i){
+            meanXValues.push(i);
         }
-
+     
+        
+        
         //Call function to plot data
-        let plotResult = await plotData(xValues, yValues);
+        let plotResult = await plotData(OriginalXValues, OriginalYValues, meanXValues, meanYValues);
         console.log("Plot for predicted synthetic data'" + "' available at: " + plotResult.url);
 
         return {
@@ -49,20 +65,35 @@ export const handler = async (event) => {
 
 
 //Plots the specified data
-async function plotData(xValues, yValues){
+async function plotData(OriginalXValues, originalYValues, meanXValues, meanYValues){
+    
     //Data structure
-    let syntheticData = {
-        x: xValues,
-        y: yValues,
+    let trace1 = {
+        x: OriginalXValues,
+        y: originalYValues,
         type: "scatter",
         mode: 'line',
-        name: "Predicted Synthetic Data",
+        name: "Original",
         marker: {
             color: 'rgb(219, 64, 82)',
             size: 12
         }
     };
-    let data = [syntheticData];
+    
+    let trace2 = {
+         x: meanXValues,
+        y: meanYValues,
+        type: "scatter",
+        mode: 'line',
+        name: "Mean",
+        marker: {
+            color: 'rgb(219, 64, 82)',
+            size: 12
+        }
+    };
+  
+    
+    let data = [trace1, trace2];
 
     //Layout of graph
     let layout = {
@@ -83,7 +114,7 @@ async function plotData(xValues, yValues){
         fileopt: "overwrite"
     };
 
-    //Wrap Plotly callback in a promise
+
     return new Promise ( (resolve, reject)=> {
         plotly.plot(data, graphOptions, function (err, msg) {
             if (err)
@@ -108,7 +139,7 @@ const endpointData = {
     ],
     "configuration": {
         "num_samples": 50,
-        "output_types": ["mean"],
+        "output_types": ["mean","quantiles","samples"],
         "quantiles": ["0.1", "0.9"]
     }
 };
@@ -126,6 +157,6 @@ async function invokeEndpoint () {
 
     // Parse the response body from binary format to a string, then to a JavaScript object
     let predictions = JSON.parse(Buffer.from(response.Body).toString('utf8'));
-    
-    return predictions.predictions[0].mean;
+    console.log(JSON.stringify(predictions));
+    return predictions;
 }
