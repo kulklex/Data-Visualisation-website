@@ -44,8 +44,8 @@ export async function getQueryResults(team, tableName) {
     const response = await docClient.send(command);
     const result = response.Items;
 
-    // Returning results for the last 50 matches 
-    return result.slice(Math.max(result.length - 50, 0));
+    // Returning results for the last 100 matches 
+    return result.slice(Math.max(result.length - 100, 0));
 }
 
 export async function getSentimentData(team) {
