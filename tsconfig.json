@@ -7,7 +7,7 @@
     "strict": true,                                      /* Enable all strict type-checking options. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["*.ts", "../chrome/FootballData.ts"],
+  "include": ["*.ts", "../chrome/FootballData.ts", "helpers/downloadSyntheticData.ts", "helpers/downloadFootballData.ts"],
   "exclude": ["node_modules"]
 }
 

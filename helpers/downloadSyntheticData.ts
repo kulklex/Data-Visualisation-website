@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { promises as fs } from 'fs';
 
-async function downloadDataAndSaveToFile(): Promise<void> {
+async function downloadDataAndSaveToFile() {
     try {
         const response = await axios.get('https://y2gtfx0jg3.execute-api.us-east-1.amazonaws.com/prod/M00919866');
         
