@@ -44,12 +44,11 @@ export async function getQueryResults(team, tableName) {
     const response = await docClient.send(command);
     const result = response.Items;
 
-    // Returning results for the last 50 matches 
-    return result.slice(Math.max(result.length - 50, 0));
+    // Returning results for the last 100 matches 
+    return result.slice(Math.max(result.length - 100, 0));
 }
 
 export async function getSentimentData(team) {
-    
     // Creating a new variable based on stored values in DB
     let sentimentTeam;
     if (team === "Manchester Utd") {
@@ -84,35 +83,31 @@ export async function getSentimentData(team) {
 // Fetch football teams results and process the data
 export async function getData(teamName) {
     const results = await getQueryResults(teamName, "FootballMatches");
+    const predictions = await getQueryResults(teamName, "PredictedResults");
 
-    let xArray = results?.map(item => {
+    // Actual result for x axis
+    let actualXArray = results?.map(item => {
         // convert timestamp in millisecs to usable date format
         const timestamp = item.MatchTS;
         const date = new Date(timestamp);
         return date.toISOString().slice(0, 19).replace('T', ' ');
     });
-    let yArray = results?.map(item => item.Score);
+    
+    // Actual result for y axis
+    let actualYArray = results?.map(item => item.Score);
+    
+    // Predicted result for y axis
+    let predictedYArray = predictions?.map(item => item.Score);
 
     let data = {
         actual: {
-            x: xArray,
-            y: yArray,
+            x: actualXArray,
+            y: actualYArray,
             type: "scatter"
         },
         predicted: {
-            x: [
-                '2023-09-01',
-                '2023-10-04',
-                '2023-11-06',
-                '2023-12-09',
-                '2024-01-11',
-                '2024-02-13',
-                '2024-03-17',
-                '2024-04-19',
-                '2024-05-22',
-                '2024-06-24'
-            ],
-            y: [1, 2, 2, 3, 2, 2, 4, 5],
+            x: ['2023-09-01', '2023-10-04', '2023-11-06', '2023-12-09', '2024-01-11', '2024-02-13', '2024-03-17', '2024-04-19', '2024-05-22', '2024-06-24', '2024-07-01', '2024-07-08', '2024-07-15', '2024-07-22', '2024-07-29', '2024-08-05', '2024-08-12', '2024-08-19', '2024-08-26', '2024-09-02', '2024-09-09', '2024-09-16', '2024-09-23', '2024-09-30', '2024-10-07', '2024-10-14', '2024-10-21', '2024-10-28', '2024-11-04', '2024-11-11', '2024-11-18', '2024-11-25', '2024-12-02', '2024-12-09', '2024-12-16', '2024-12-23', '2024-12-30', '2025-01-06', '2025-01-13', '2025-01-20', '2025-01-27', '2025-02-03', '2025-02-10', '2025-02-17', '2025-02-24', '2025-03-03', '2025-03-10', '2025-03-17', '2025-03-24', '2025-03-31'],
+            y: predictedYArray,
             type: "scatter"
         }
     };
@@ -126,5 +121,6 @@ export async function getSentiments(teamName) {
     const labels = results?.map(item => item.Result.label);
 
     const data = [labels];
+    console.log("Data: " + data);
     return data;
 }
