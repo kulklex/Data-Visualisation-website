@@ -157,6 +157,6 @@ async function invokeEndpoint () {
 
     // Parse the response body from binary format to a string, then to a JavaScript object
     let predictions = JSON.parse(Buffer.from(response.Body).toString('utf8'));
-    console.log(JSON.stringify(predictions));
+   
     return predictions;
 }
